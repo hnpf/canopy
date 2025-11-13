@@ -1,19 +1,6 @@
 # Canopy
-
-A command-line tool for generating and visualizing directory tree structures in the terminal.
 ![meow](github/demos/meow.png)
-
-![demo main](github/demos/demomain.png)
-ran after just the interactive flag
-
-![demo2](github/demos/demo2.png)
-ran virex-canopy C:\ --depth 0
-
-![democolors](github/demos/democolors.png)
-ran just --test-colors
-
-![demohelp](github/demos/demohelp.png)
-shows the -h flag command
+A command-line tool for generating and visualizing directory tree structures in the terminal!
 
 
 ## Usage
@@ -29,6 +16,21 @@ canopy /path/to/directory
 ```
 
 This will print a tree-like structure of the directory and its subdirectories.
+
+## Screenshots!
+
+![demo main](github/demos/demomain.png)
+Ran after just the `--interactive` flag!
+
+![demo2](github/demos/demo2.png)
+Ran `virex-canopy C:\ --depth 0`
+
+![democolors](github/demos/democolors.png)
+Ran just `--test-colors`
+
+![demohelp](github/demos/demohelp.png)
+This is the `-h` flag command!
+
 
 ## Installation
 
