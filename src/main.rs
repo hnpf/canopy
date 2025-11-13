@@ -8,7 +8,7 @@ struct Args {
     /// Path to the directory to visualize
     path: String,
 }
-
+/// Gotta love how simple RS is
 fn main() {
     let args = Args::parse();
     let path = Path::new(&args.path);
