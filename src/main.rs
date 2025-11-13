@@ -28,49 +28,50 @@ struct TreeNode {
 #[command(about = "Generate and visualize directory tree structures")]
 #[command(disable_help_flag = true)]
 struct Args {
-    /// Path to the directory to visualize
+    /// === path to the dir to visualize === ///
     path: Option<String>,
 
-    /// maximum depth to traverse, fuck yeah limit that shit
+    /// === maximum depth to traverse, now u can limit that shit lolw === ///
+
     #[arg(long)]
     depth: Option<usize>,
 
-    /// include hidden files starting with ., damn dotfiles
+    /// === include hidden files starting with ., screw the dots :fire: === ///
     #[arg(long)]
     hidden: bool,
 
-    /// collapse empty folders and 1-file chains, make it meaningful
+    /// === collapse empty folders and 1-file chains, make it meaningful === ///
     #[arg(long)]
     collapse: bool,
 
-    /// export to json or csv, for programmatic use
+    /// === export to json or csv, for programmatic use === ///
     #[arg(long)]
     export: Option<String>,
 
-    /// export to json
+    /// === export to json
     #[arg(long)]
     json: bool,
 
-    /// enable interactive TUI mode, navigate with arrows and enter
+    /// === enable interactive TUI mode, navigate with arrows and enter === ///
     #[arg(long)]
     interactive: bool,
 
-    /// filter files with glob pattern, e.g. *.rs
+    /// === filter files with glob pattern, e.g. *.rs === ///
     #[arg(long)]
     filter: Option<String>,
 
-    /// test color output
+    /// === this tests color output === ///
     #[arg(long)]
     test_colors: bool,
 
-    /// check if exe is in PATH
+    /// === check if exe is in PATH === ///
     #[arg(long)]
     check_path: bool,
 }
 
 fn print_welcome() {
     println!("╔══════════════════════════╗");
-    println!("║   Welcome to Virex-Canopy!   ║");
+    println!("║     Welcome to Canopy!   ║");
     println!("╚══════════════════════════╝");
     println!();
     println!("Your directory tree visualizer is ready to go!");
@@ -131,7 +132,6 @@ fn format_size(bytes: u64) -> String {
 }
 
 fn get_size_color(size: u64) -> Color {
-    // heatmap for sizes, small green, medium yellow, large red
     if size < 1024 {
         Color::Green
     } else if size < 1024 * 1024 {
@@ -261,7 +261,7 @@ fn build_tree(path: &Path, max_depth: Option<usize>, show_hidden: bool, filter: 
         }
     };
     let mut entries = entries;
-    // skip hidden files if not showing them, fuck dotfiles
+    // skip hidden files if not showing them, dotfiles smh
     if !show_hidden {
         entries.retain(|e| !e.file_name().to_string_lossy().starts_with('.'));
     }
@@ -593,6 +593,6 @@ fn run_tui(path: &Path, show_hidden: bool, filter: Option<&str>) -> io::Result<(
     )?;
     match res {
         Ok(inner) => inner,
-        Err(_) => Err(io::Error::new(io::ErrorKind::Other, "Panic in TUI")),
+        Err(_) => Err(io::Error::new(io::ErrorKind::Other, "TUI Panicked!!!")),
     }
 }
