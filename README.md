@@ -1,6 +1,20 @@
 # Canopy
 
-A command-line tool made in Rust for generating and visualizing directory tree structures in the terminal!
+A command-line tool for generating and visualizing directory tree structures in the terminal.
+![meow](github/demos/meow.png)
+
+![demo main](github/demos/demomain.png)
+ran after just the interactive flag
+
+![demo2](github/demos/demo2.png)
+ran virex-canopy C:\ --depth 0
+
+![democolors](github/demos/democolors.png)
+ran just --test-colors
+
+![demohelp](github/demos/demohelp.png)
+shows the -h flag command
+
 
 ## Usage
 
@@ -11,38 +25,32 @@ canopy <path>
 Example:
 
 ```
-canopy C:\Windows\System32\
+canopy /path/to/directory
 ```
 
-This will print a tree-like structure of the directory and its subdirectories :)
+This will print a tree-like structure of the directory and its subdirectories.
 
 ## Installation
 
 ### Using the Installer
 
-1. Download the installer binary for your platform from the releases page!
+1. Download the installer binary for your platform from the releases page.
 
-2. Install from Crate:
-     ```
-     cargo install virex-canopy
-     ```
-   - Launch with virex-canopy!
-     
-3. Run the installer:
+2. Run the installer:
 
    - Windows: `canopy-installer.exe`
    - Linux: `./canopy-installer`
 
-   The installer will copy the canopy binary to your home directory and add it to your PATH!
-   
+   The installer will copy the canopy binary to your home directory and add it to your PATH.
+
 ### From Source
 
-1. Make sure you have Rust installed! If not, just download it from [rustup.rs](https://rustup.rs/).
+1. Ensure you have Rust installed. Download from [rustup.rs](https://rustup.rs/).
 
 2. Clone the repository:
 
    ```
-   git clone https://github.com/hnpf/canopy
+   git clone <repository-url>
    cd canopy
    ```
 
@@ -75,9 +83,9 @@ To build for a specific target:
 ## Features
 
 - Recursive directory traversal
-- A clean tree visualization with Unicode box-drawing characters
+- Clean tree visualization with Unicode box-drawing characters
 - Sorted output for consistent results
-- Actual handling for invalid paths!!
+- Error handling for invalid paths
 
 ## Contributing
 
@@ -85,4 +93,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-This project is licensed under the GNU GENERAL PUBLIC LICENSE.
+This project is licensed under the MIT License.
