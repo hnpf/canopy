@@ -33,8 +33,14 @@ This is the `-h` flag command!
 
 
 ## Installation
+### Option 1, Crates!
 
-### Using the Installer
+1. Simply use crates to install canopy!
+2. Command:
+   - `cargo install virex-canopy`
+   - that's it!
+     
+### Option 2, Using the Installer
 
 1. Download the installer binary for your platform from the releases page.
 
@@ -45,7 +51,7 @@ This is the `-h` flag command!
 
    The installer will copy the canopy binary to your home directory and add it to your PATH.
 
-### From Source
+### Option 3, From Source
 
 1. Ensure you have Rust installed. Download from [rustup.rs](https://rustup.rs/).
 
@@ -96,3 +102,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## License
 
 This project is licensed under the MIT License.
+
