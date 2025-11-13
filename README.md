@@ -22,7 +22,11 @@ This will print a tree-like structure of the directory and its subdirectories :)
 
 1. Download the installer binary for your platform from the releases page!
 
-2. Run the installer:
+2. Install from Crate:
+   -  `cargo install virex-canopy`
+   - Launch with virex-canopy!
+     
+3. Run the installer:
 
    - Windows: `canopy-installer.exe`
    - Linux: `./canopy-installer`
