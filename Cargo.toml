@@ -1,7 +1,21 @@
 [package]
-name = "canopy"
+name = "virex-canopy" 
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
+authors = ["VIREX deprecated@virex.lol"]
+description = "Generate and visualize directory tree structures"
+license = "GPL-3.0"
+repository = "https://github.com/hnpf/canopy"
+keywords = ["cli", "filesystem", "tree", "visualizer"]
+categories = ["command-line-utilities"]
 
 [dependencies]
 clap = { version = "4.0", features = ["derive"] }
+colored = "2.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+csv = "1.1"
+winapi = { version = "0.3", features = ["consoleapi", "wincon", "processenv", "winbase"] }
+glob = "0.3"
+crossterm = "0.27"
+ratatui = "0.26"
