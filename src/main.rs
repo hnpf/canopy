@@ -117,50 +117,6 @@ fn enable_ansi() {
     }
 }
 
-fn get_icon(entry: &std::fs::DirEntry) -> String {
-    if entry.file_type().unwrap().is_dir() {
-        "[DIR] ".to_string()
-    } else {
-        // check size for big files
-        if let Ok(metadata) = entry.metadata() {
-            if metadata.len() > 1024 * 1024 { // 1MB
-                return "[BIG] ".to_string();
-            }
-        }
-        let path = entry.path();
-        if let Some(ext) = path.extension() {
-            let ext_str = ext.to_string_lossy().to_lowercase();
-            match ext_str.as_str() {
-                "py" => "[.py] ".to_string(),
-                "rs" => "[.rs] ".to_string(),
-                "js" => "[.js] ".to_string(),
-                "ts" => "[.ts] ".to_string(),
-                "html" => "[.html] ".to_string(),
-                "css" => "[.css] ".to_string(),
-                "md" => "[.md] ".to_string(),
-                "txt" => "[.txt] ".to_string(),
-                "exe" | "bat" | "cmd" | "sh" => "[EXEC] ".to_string(),
-                _ => format!("[{}] ", ext_str),
-            }
-        } else {
-            "[FILE] ".to_string()
-        }
-    }
-}
-fn get_color(entry: &std::fs::DirEntry) -> Color {
-    let file_name = entry.file_name();
-    let file_name_str = file_name.to_string_lossy();
-    if file_name_str.starts_with('.') {
-        return Color::BrightBlack;
-    } else if entry.file_type().unwrap().is_dir() {
-        return Color::Blue;
-    } else if is_executable(&entry.path()) {
-        return Color::Green;
-    } else {
-        return Color::White;
-    }
-}
-
 fn format_size(bytes: u64) -> String {
     // format bytes to human readable, damn big numbers
     if bytes < 1024 {
@@ -196,11 +152,9 @@ fn main() {
     // check if in PATH
     let exe_path = std::env::current_exe().unwrap();
     let exe_name = exe_path.file_name().unwrap().to_string_lossy();
-    let path_env = std::env::var("PATH").unwrap_or_default();
-    let in_path = path_env.split(';').any(|p| {
-        let p_path = Path::new(p);
-        p_path.join(&*exe_name).exists()
-    });
+    let path_var = std::env::var_os("PATH").unwrap_or_default();
+    let paths: Vec<std::path::PathBuf> = std::env::split_paths(&path_var).collect();
+    let in_path = paths.iter().any(|p| p.join(exe_name.as_ref()).exists());
     if !in_path {
         print_welcome();
         thread::sleep(Duration::from_secs(4));
@@ -222,13 +176,11 @@ fn main() {
     if args.check_path {
         let exe_path = std::env::current_exe().unwrap();
         let exe_name = exe_path.file_name().unwrap().to_string_lossy();
-        let path_env = std::env::var("PATH").unwrap_or_default();
-        let found_path = path_env.split(';').find(|p| {
-            let p_path = Path::new(p);
-            p_path.join(&*exe_name).exists()
-        });
+        let path_var = std::env::var_os("PATH").unwrap_or_default();
+        let paths: Vec<std::path::PathBuf> = std::env::split_paths(&path_var).collect();
+        let found_path = paths.iter().find(|p| p.join(exe_name.as_ref()).exists());
         if let Some(p) = found_path {
-            println!("yes {}", Path::new(p).join(&*exe_name).display());
+            println!("yes {}", p.join(exe_name.as_ref()).display());
         } else {
             println!("no");
         }
@@ -318,18 +270,15 @@ fn build_tree(path: &Path, max_depth: Option<usize>, show_hidden: bool, filter: 
     if let Some(pattern) = filter {
         let pat = glob::Pattern::new(pattern).unwrap_or(glob::Pattern::new("*").unwrap());
         entries.retain(|e| {
-            if e.file_type().unwrap().is_dir() {
-                true
-            } else {
-                pat.matches(&e.file_name().to_string_lossy())
-            }
+            let is_dir = e.file_type().map(|ft| ft.is_dir()).unwrap_or(false);
+            is_dir || pat.matches(&e.file_name().to_string_lossy())
         });
     }
 
     let mut children = Vec::new();
     for entry in entries {
         let name = entry.file_name().to_string_lossy().to_string();
-        let is_dir = entry.file_type()?.is_dir();
+        let is_dir = entry.file_type().map(|ft| ft.is_dir()).unwrap_or(false);
         let size = if is_dir {
             None
         } else {
@@ -496,11 +445,8 @@ fn get_entries(path: &Path, show_hidden: bool, filter: Option<&str>) -> io::Resu
     if let Some(pattern) = filter {
         let pat = glob::Pattern::new(pattern).unwrap_or(glob::Pattern::new("*").unwrap());
         entries.retain(|e| {
-            if e.file_type().unwrap().is_dir() {
-                true
-            } else {
-                pat.matches(&e.file_name().to_string_lossy())
-            }
+            let is_dir = e.file_type().map(|ft| ft.is_dir()).unwrap_or(false);
+            is_dir || pat.matches(&e.file_name().to_string_lossy())
         });
     }
 
@@ -508,7 +454,8 @@ fn get_entries(path: &Path, show_hidden: bool, filter: Option<&str>) -> io::Resu
 }
 
 fn get_icon_for_entry(entry: &std::fs::DirEntry) -> String {
-    if entry.file_type().unwrap().is_dir() {
+    let is_dir = entry.file_type().map(|ft| ft.is_dir()).unwrap_or(false);
+    if is_dir {
         "[DIR] ".to_string()
     } else {
         if let Ok(metadata) = entry.metadata() {
@@ -542,12 +489,15 @@ fn get_color_for_entry(entry: &std::fs::DirEntry) -> TuiColor {
     let file_name_str = file_name.to_string_lossy();
     if file_name_str.starts_with('.') {
         TuiColor::Gray
-    } else if entry.file_type().unwrap().is_dir() {
-        TuiColor::Blue
-    } else if is_executable(&entry.path()) {
-        TuiColor::Green
     } else {
-        TuiColor::White
+        let is_dir = entry.file_type().map(|ft| ft.is_dir()).unwrap_or(false);
+        if is_dir {
+            TuiColor::Blue
+        } else if is_executable(&entry.path()) {
+            TuiColor::Green
+        } else {
+            TuiColor::White
+        }
     }
 }
 
@@ -561,80 +511,88 @@ fn run_tui(path: &Path, show_hidden: bool, filter: Option<&str>) -> io::Result<(
     let mut selected = 0;
     let mut entries = get_entries(&current_path, show_hidden, filter)?;
 
-    loop {
-        terminal.draw(|f| {
-            let size = f.size();
-            let items: Vec<ListItem> = entries.iter().map(|e| {
-                let icon = get_icon_for_entry(e);
-                let color = get_color_for_entry(e);
-                let name = e.file_name().to_string_lossy().to_string();
-                ListItem::new(Line::from(vec![
-                    Span::styled(icon, Style::default().fg(color)),
-                    Span::styled(name, Style::default()),
-                ]))
-            }).collect();
+    let res = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| -> io::Result<()> {
+        loop {
+            terminal.draw(|f| {
+                let size = f.size();
+                let items: Vec<ListItem> = entries.iter().map(|e| {
+                    let icon = get_icon_for_entry(e);
+                    let color = get_color_for_entry(e);
+                    let name = e.file_name().to_string_lossy().to_string();
+                    ListItem::new(Line::from(vec![
+                        Span::styled(icon, Style::default().fg(color)),
+                        Span::styled(name, Style::default()),
+                    ]))
+                }).collect();
 
-            let list = List::new(items)
-                .block(Block::default().borders(Borders::ALL).title(format!("{} ({} items)", current_path.display(), entries.len())))
-                .highlight_style(Style::default().add_modifier(Modifier::BOLD))
-                .highlight_symbol(">> ");
+                let list = List::new(items)
+                    .block(Block::default().borders(Borders::ALL).title(format!("{} ({} items)", current_path.display(), entries.len())))
+                    .highlight_style(Style::default().add_modifier(Modifier::BOLD))
+                    .highlight_symbol(">> ");
 
-            let mut state = ListState::default();
-            state.select(Some(selected));
+                let mut state = ListState::default();
+                state.select(Some(selected));
 
-            f.render_stateful_widget(list, size, &mut state);
-        })?;
+                f.render_stateful_widget(list, size, &mut state);
+            })?;
 
-        if let Event::Key(key) = event::read()? {
-            if key.kind == KeyEventKind::Press {
-                match key.code {
-                    KeyCode::Up => {
-                        if selected > 0 {
-                            selected -= 1;
+            if let Event::Key(key) = event::read()? {
+                if key.kind == KeyEventKind::Press {
+                    match key.code {
+                        KeyCode::Up => {
+                            if selected > 0 {
+                                selected -= 1;
+                            }
                         }
-                    }
-                    KeyCode::Down => {
-                        if selected < entries.len().saturating_sub(1) {
-                            selected += 1;
+                        KeyCode::Down => {
+                            if selected < entries.len().saturating_sub(1) {
+                                selected += 1;
+                            }
                         }
-                    }
-                    KeyCode::Right => {
-                        if let Some(entry) = entries.get(selected) {
-                            if entry.file_type().unwrap().is_dir() {
-                                current_path.push(entry.file_name());
+                        KeyCode::Right => {
+                            if let Some(entry) = entries.get(selected) {
+                                let is_dir = entry.file_type().map(|ft| ft.is_dir()).unwrap_or(false);
+                                if is_dir {
+                                    current_path.push(entry.file_name());
+                                    entries = get_entries(&current_path, show_hidden, filter)?;
+                                    selected = 0;
+                                }
+                            }
+                        }
+                        KeyCode::Enter => {
+                            if let Some(entry) = entries.get(selected) {
+                                let path_str = entry.path().to_string_lossy().to_string();
+                                let is_dir = entry.file_type().map(|ft| ft.is_dir()).unwrap_or(false);
+                                if is_dir {
+                                    std::process::Command::new("explorer").arg(&path_str).spawn().ok();
+                                } else {
+                                    std::process::Command::new("cmd").args(&["/c", "start", "", &path_str]).spawn().ok();
+                                }
+                            }
+                        }
+                        KeyCode::Left | KeyCode::Backspace | KeyCode::Esc => {
+                            if current_path != path {
+                                current_path.pop();
                                 entries = get_entries(&current_path, show_hidden, filter)?;
                                 selected = 0;
                             }
                         }
+                        KeyCode::Char('q') => break,
+                        _ => {}
                     }
-                    KeyCode::Enter => {
-                        if let Some(entry) = entries.get(selected) {
-                            let path_str = entry.path().to_string_lossy().to_string();
-                            if entry.file_type().unwrap().is_dir() {
-                                std::process::Command::new("explorer").arg(&path_str).spawn().ok();
-                            } else {
-                                std::process::Command::new("cmd").args(&["/c", "start", "", &path_str]).spawn().ok();
-                            }
-                        }
-                    }
-                    KeyCode::Left | KeyCode::Backspace | KeyCode::Esc => {
-                        if current_path != path {
-                            current_path.pop();
-                            entries = get_entries(&current_path, show_hidden, filter)?;
-                            selected = 0;
-                        }
-                    }
-                    KeyCode::Char('q') => break,
-                    _ => {}
                 }
             }
         }
-    }
+        Ok(())
+    }));
 
     crossterm::execute!(
         terminal.backend_mut(),
         DisableMouseCapture,
         crossterm::terminal::LeaveAlternateScreen
     )?;
-    Ok(())
+    match res {
+        Ok(inner) => inner,
+        Err(_) => Err(io::Error::new(io::ErrorKind::Other, "Panic in TUI")),
+    }
 }
