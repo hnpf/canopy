@@ -1,11 +1,14 @@
 # Canopy
 
-[![Crates.io version](https://img.shields.io/crates/v/virex-canopy)](https://crates.io/crates/virex-canopy)
-[![Crates.io downloads](https://img.shields.io/crates/d/virex-canopy)](https://crates.io/crates/virex-canopy)
+[![Crates.io version](https://img.shields.io/crates/v/virex-canopy)](https://crates.io/crates/v/virex-canopy)
+[![Crates.io downloads](https://img.shields.io/crates/d/virex-canopy)](https://crates.io/crates/v/virex-canopy)
 [![Repo size](https://img.shields.io/github/repo-size/hnpf/canopy)](https://github.com/hnpf/canopy)
 [![Made with love](https://img.shields.io/badge/made%20with-love-red)](https://github.com/hnpf/canopy)
 [![Donate LTC](https://img.shields.io/badge/donate-LTC-3b99fc)](litecoin:Lff8Zq8ZEjApxoVo2T1bAV7o1CKSitFp9S)
-[![code](https://img.shields.io/badge/code-%F0%9F%92%A3%20fucking%20works-critical)](https://img.shields.io/badge/code-%F0%9F%92%A3%20fucking%20works-critical)
+[![Rust](https://img.shields.io/badge/rust-stable-orange)](https://www.rust-lang.org/)
+[![Coffee](https://img.shields.io/badge/coffee-%E2%98%95-brown)](https://www.google.com/search?q=coffee)
+[![Probably broken](https://img.shields.io/badge/status-probably%20broken%20idk-green)](https://github.com/hnpf/canopy/issues)
+
 ![meow](github/demos/meow.png)
 A command-line tool for generating and visualizing directory tree structures in the terminal!
 
@@ -109,6 +112,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## License
 
 This project is licensed under the MIT License.
+
 
 
 
