@@ -5,7 +5,7 @@
 [![Repo size](https://img.shields.io/github/repo-size/hnpf/canopy)](https://github.com/hnpf/canopy)
 [![Made with love](https://img.shields.io/badge/made%20with-love-red)](https://github.com/hnpf/canopy)
 [![Donate LTC](https://img.shields.io/badge/donate-LTC-3b99fc)](litecoin:Lff8Zq8ZEjApxoVo2T1bAV7o1CKSitFp9S)
-
+[![code](https://img.shields.io/badge/code-%F0%9F%92%A3%20fucking%20works-critical)](https://img.shields.io/badge/code-%F0%9F%92%A3%20fucking%20works-critical)
 ![meow](github/demos/meow.png)
 A command-line tool for generating and visualizing directory tree structures in the terminal!
 
@@ -109,5 +109,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## License
 
 This project is licensed under the MIT License.
+
 
 
