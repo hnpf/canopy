@@ -1,4 +1,11 @@
 # Canopy
+
+[![Crates.io version](https://img.shields.io/crates/v/virex-canopy)](https://crates.io/crates/virex-canopy)
+[![Crates.io downloads](https://img.shields.io/crates/d/virex-canopy)](https://crates.io/crates/virex-canopy)
+[![Repo size](https://img.shields.io/github/repo-size/hnpf/canopy)](https://github.com/hnpf/canopy)
+[![Made with love](https://img.shields.io/badge/made%20with-love-red)](https://github.com/hnpf/canopy)
+[![Donate LTC](https://img.shields.io/badge/donate-LTC-3b99fc)](litecoin:Lff8Zq8ZEjApxoVo2T1bAV7o1CKSitFp9S)
+
 ![meow](github/demos/meow.png)
 A command-line tool for generating and visualizing directory tree structures in the terminal!
 
@@ -102,4 +109,5 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## License
 
 This project is licensed under the MIT License.
+
 
