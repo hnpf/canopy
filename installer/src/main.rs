@@ -1,11 +1,11 @@
 use std::env;
 use std::fs;
 use std::io::{self, Write};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 
-static CANOPY_BINARY: &[u8] = include_bytes!("../virex-canopy.exe");
-// if youre using a custom license or just using it for yourself, update this accordingly! :D
+// embed the binary. it's like inception, but with code!
+static CANOPY_BINARY: &[u8] = include_bytes!("payload.bin");
 static LICENSE: &str = r#" 
                     GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
@@ -625,74 +625,18 @@ Program, unless a warranty or assumption of liability accompanies a
 copy of the Program in return for a fee.
 
                      END OF TERMS AND CONDITIONS
+ "#;
 
-            How to Apply These Terms to Your New Programs
-
-  If you develop a new program, and you want it to be of the greatest
-possible use to the public, the best way to achieve this is to make it
-free software which everyone can redistribute and change under these terms.
-
-  To do so, attach the following notices to the program.  It is safest
-to attach them to the start of each source file to most effectively
-state the exclusion of warranty; and each file should have at least
-the "copyright" line and a pointer to where the full notice is found.
-
-    <one line to give the program's name and a brief idea of what it does.>
-    Copyright (C) <year>  <name of author>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-Also add information on how to contact you by electronic and paper mail.
-
-  If the program does terminal interaction, make it output a short
-notice like this when it starts in an interactive mode:
-
-    <program>  Copyright (C) <year>  <name of author>
-    This program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
-    This is free software, and you are welcome to redistribute it
-    under certain conditions; type `show c' for details.
-
-The hypothetical commands `show w' and `show c' should show the appropriate
-parts of the General Public License.  Of course, your program's commands
-might be different; for a GUI interface, you would use an "about box".
-
-  You should also get your employer (if you work as a programmer) or school,
-if any, to sign a "copyright disclaimer" for the program, if necessary.
-For more information on this, and how to apply and follow the GNU GPL, see
-<https://www.gnu.org/licenses/>.
-
-  The GNU General Public License does not permit incorporating your program
-into proprietary programs.  If your program is a subroutine library, you
-may consider it more useful to permit linking proprietary applications with
-the library.  If this is what you want to do, use the GNU Lesser General
-Public License instead of this License.  But first, please read
-<https://www.gnu.org/licenses/why-not-lgpl.html>.
-"#;
-//EO license
-// License is bigger than the codebase itself, that shows i take legal stuff seriously, not just “here’s a binary, good luck.”.. jk, i reeally dont care :D
 fn main() {
     println!("Installing Virex-Canopy...");
-    println!();
-    println!("This installer will install Virex-Canopy on your system.");
     println!();
 
     loop {
         println!("Options:");
-        println!("  Press Enter to finish the installation");
-        println!("  Press L to view the license");
-        println!("  Press Q to quit");
-        print!("Your choice: ");
+        println!("  [Enter] Install this asap");
+        println!("  [L]     Read the boring legal stuff");
+        println!("  [Q]     Quit (coward)");
+        print!("> ");
         io::stdout().flush().unwrap();
 
         let mut input = String::new();
@@ -700,89 +644,108 @@ fn main() {
         let input = input.trim().to_lowercase();
 
         match input.as_str() {
-            "" => {
-                break;
-            }
-            "l" => {
-                println!();
-                println!("{}", LICENSE);
-                println!();
-            }
+            "" => break,
+            "l" => println!("\n{}\n", LICENSE),
             "q" => {
-                println!("cancelled the installation.");
+                println!("Installation cancelled. bye!");
                 return;
             }
-            _ => {
-                println!("bad choice. try again.");
-                println!();
-            }
+            _ => println!("Invalid input."),
         }
     }
 
     let os = env::consts::OS;
-    let home = env::var("HOME").or_else(|_| env::var("USERPROFILE")).expect("Could not find home directory! :(");
+    let home = env::var("HOME").or_else(|_| env::var("USERPROFILE")).expect("Where do you live? (No HOME var found.. somethings prolly fucked)");
 
     let install_dir = if os == "windows" {
-        Path::new(&home).join("virex-canopy")
+        Path::new(&home).join("AppData").join("Local").join("virex-canopy")
     } else {
-        Path::new(&home).join("virex-canopy")
+        Path::new(&home).join(".local").join("bin")
     };
+
     if let Err(e) = fs::create_dir_all(&install_dir) {
         eprintln!("Failed to create install directory: {}", e);
         return;
     }
+
     let binary_name = if os == "windows" { "virex-canopy.exe" } else { "virex-canopy" };
     let dest = install_dir.join(binary_name);
 
+    println!("Writing binary to {}...", dest.display());
     if let Err(e) = fs::write(&dest, CANOPY_BINARY) {
         eprintln!("Failed to write binary: {}", e);
         return;
     }
-
-    println!("Binary installed to: {}", dest.display());
-
-    // PATH time yay
-    if os == "windows" {
-        add_to_path_windows(install_dir.to_string_lossy().as_ref());
-    } else {
-        add_to_path_linux(install_dir.to_string_lossy().as_ref());
+    
+    // make executable on unix
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let mut perms = fs::metadata(&dest).unwrap().permissions();
+        perms.set_mode(0o755);
+        fs::set_permissions(&dest, perms).unwrap();
     }
 
-    println!("Installation finished! Please restart your terminal or run 'source ~/.bashrc' (Linux) to use virex-canopy. :D");
+    println!("Binary installed successfully!");
+
+    // PATH manipulation
+    if os == "windows" {
+        add_to_path_windows(&install_dir);
+    } else {
+        add_to_path_linux(&install_dir);
+    }
+
+    println!("Installation complete! You may need to restart your shell.");
     pause();
 }
 
 fn pause() {
     let mut stdout = io::stdout();
-    write!(stdout, "Press Enter to continue…").unwrap();
-    stdout.flush().unwrap(); // make sure it prints before waiting
+    write!(stdout, "Press Enter to finish...").unwrap();
+    stdout.flush().unwrap();
     let _ = io::stdin().read_line(&mut String::new());
 }
 
-fn add_to_path_windows(dir: &str) {
+fn add_to_path_windows(dir: &Path) {
+    // using setx is sketchy but effective for user env
+    let dir_str = dir.to_string_lossy();
     let output = Command::new("setx")
-        .args(&["PATH", &format!("%PATH%;{}", dir)])
+        .args(&["PATH", &format!("%PATH%;{}", dir_str)])
         .output();
-
     match output {
-        Ok(_) => println!("Added {} to PATH. Restart your command prompt to apply.", dir),
-        Err(e) => eprintln!("Failed to add to PATH: {}. You may need to add {} to your PATH manually.", e, dir),
+        Ok(_) => println!("Added to PATH. Please restart your terminal."),
+        Err(e) => eprintln!("Failed to update PATH: {}", e),
     }
 }
 
-fn add_to_path_linux(dir: &str) {
-    let bashrc = env::var("HOME").unwrap() + "/.bashrc";
-    let export_line = format!("\nexport PATH=\"$PATH:{}\"\n", dir);
-
-    match fs::OpenOptions::new().append(true).open(&bashrc) {
-        Ok(mut file) => {
-            use std::io::Write;
-            if file.write_all(export_line.as_bytes()).is_ok() {
-                println!("Added {} to PATH in ~/.bashrc. Run 'source ~/.bashrc' to apply.", dir);
-            } else {
-                eprintln!("Failed to write to ~/.bashrc. Add 'export PATH=\"$PATH:{}\"' manually.", dir);
-            }
+fn add_to_path_linux(dir: &Path) {
+    let bashrc = Path::new(&env::var("HOME").unwrap()).join(".bashrc");
+    let zshrc = Path::new(&env::var("HOME").unwrap()).join(".zshrc");
+    let export_line = format!("\nexport PATH=\"$PATH:{}\"\n", dir.display());
+    
+    // try bashrc
+    if bashrc.exists() {
+        if let Ok(content) = fs::read_to_string(&bashrc) {
+             if !content.contains(&format!(":{}", dir.display())) {
+                 let mut file = fs::OpenOptions::new().append(true).open(&bashrc).unwrap();
+                 file.write_all(export_line.as_bytes()).unwrap();
+                 println!("Added to ~/.bashrc");
+             } else {
+                 println!("Already in ~/.bashrc");
+             }
         }
-        Err(e) => eprintln!("Failed to open ~/.bashrc: {}. Add 'export PATH=\"$PATH:{}\"' manually.", e, dir),
     }
+    
+    // try zshrc
+    if zshrc.exists() {
+        if let Ok(content) = fs::read_to_string(&zshrc) {
+             if !content.contains(&format!(":{}", dir.display())) {
+                 let mut file = fs::OpenOptions::new().append(true).open(&zshrc).unwrap();
+                 file.write_all(export_line.as_bytes()).unwrap();
+                 println!("Added to ~/.zshrc");
+             }
+        }
+    }
+    
+    println!("Run 'source ~/.bashrc' (or zshrc) to apply changes.");
 }

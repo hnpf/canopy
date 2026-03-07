@@ -104,9 +104,10 @@ To build for a specific target:
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please feel free to submit a PR.
 
 ## License
 
 This project is licensed under the GPL-3.0 License. For more info, check the LICENSE File.
+
 
