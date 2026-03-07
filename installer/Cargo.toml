@@ -1,6 +1,0 @@
-[package]
-name = "canopy-installer"
-version = "0.2.3"
-edition = "2024"
-
-[dependencies]
