@@ -25,29 +25,24 @@ canopy /path/to/directory
 This will print a tree-like structure of the directory and its subdirectories.
 
 ## Screenshots!
-
+The `--interactive` flag
 ![demo main](github/demos/demomain.png)
-Ran after just the `--interactive` flag!
+`virex-canopy . --depth 0`
 
 ![demo2](github/demos/demo2.png)
-Ran `virex-canopy C:\ --depth 0`
+`--test-colors`
 
 ![democolors](github/demos/democolors.png)
-Ran just `--test-colors`
+The `--help` flag command!
 
 ![demohelp](github/demos/demohelp.png)
-This is the `-h` flag command!
+
 
 
 ## Installation
-### Option 1, Crates!
 
-1. Simply use crates to install canopy!
-2. Command:
-   - `cargo install virex-canopy`
-   - that's it!
      
-### Option 2, Using the Installer
+### Option 1, Using the Installer
 
 1. Download the installer binary for your platform from the releases page.
 
@@ -58,7 +53,7 @@ This is the `-h` flag command!
 
    The installer will copy the canopy binary to your home directory and add it to your PATH.
 
-### Option 3, From Source
+### Option 2, From Source
 
 1. Ensure you have Rust installed. Download from [rustup.rs](https://rustup.rs/).
 
