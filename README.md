@@ -1,6 +1,4 @@
 # Canopy
-
-[![Crates.io version](https://img.shields.io/crates/v/virex-canopy)](https://crates.io/crates/v/virex-canopy)
 [![Crates.io downloads](https://img.shields.io/crates/d/virex-canopy)](https://crates.io/crates/v/virex-canopy)
 [![Repo size](https://img.shields.io/github/repo-size/hnpf/canopy)](https://github.com/hnpf/canopy)
 [![Rust](https://img.shields.io/badge/rust-stable-orange)](https://www.rust-lang.org/)
